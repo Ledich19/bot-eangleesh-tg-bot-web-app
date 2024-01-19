@@ -4,13 +4,23 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 const tg = window.Telegram.WebApp;
 
+declare global {
+  interface Window {
+    Telegram: {
+      WebApp: {
+        ready: () => void;
+      };
+    };
+  }
+}
+
 function App() {
   const [count, setCount] = useState(0);
   console.log(window.Telegram.WebApp);
 
   useEffect(() => {
-    tg.ready()
-  },[])
+    tg.ready();
+  }, []);
 
   return (
     <>
