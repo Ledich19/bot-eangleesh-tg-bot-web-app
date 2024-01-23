@@ -14,6 +14,13 @@ function Game() {
         width: window.innerWidth,
         height: window.innerHeight,
       });
+
+      // Обновление размеров канваса
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     };
 
     window.addEventListener("resize", handleResize);
@@ -83,9 +90,9 @@ function Game() {
       <canvas
         ref={canvasRef}
         onClick={handleCanvasClick}
-        style={{ width: "100%", height: "100%" }}
         width={canvasSize.width}
         height={canvasSize.height}
+        style={{ width: "100%", height: "100%" }}
       ></canvas>
     </>
   );

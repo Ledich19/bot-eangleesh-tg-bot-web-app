@@ -25,11 +25,11 @@ function App() {
 
   return (
     <>
-    <Header/>
-    <Routes>
-      <Route index element={<Game/>}/>
-      <Route path="/winners" element={<Winners/>}/>
-    </Routes>
+      <Header />
+      <Routes>
+        <Route index element={<Game />} />
+        <Route path="/winners" element={<Winners />} />
+      </Routes>
     </>
   );
 }
