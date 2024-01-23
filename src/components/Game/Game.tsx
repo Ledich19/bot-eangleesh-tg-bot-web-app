@@ -2,27 +2,32 @@ import React, { useEffect, useState, useRef } from "react";
 
 function Game() {
   const [canvasSize, setCanvasSize] = useState({
-    width: 0,
-    height: 0,
+    width: window.innerWidth,
+    height:
+      window.innerHeight > window.innerWidth
+        ? window.innerWidth
+        : window.innerHeight,
   });
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const handleResize = () => {
+      setCanvasSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+
       const canvas = canvasRef.current;
       if (canvas) {
-        const parent = canvas.parentElement;
-        if (parent) {
-          const parentRect = parent.getBoundingClientRect();
-          setCanvasSize({
-            width: parentRect.width,
-            height: parentRect.height,
-          });
-          canvas.width = parentRect.width;
-          canvas.height = parentRect.height;
-          drawCanvas();
-        }
+        canvas.width = window.innerWidth;
+
+        canvas.height =
+          window.innerHeight > window.innerWidth
+            ? window.innerWidth
+            : window.innerHeight;
+
+        drawCanvas();
       }
     };
 
@@ -58,6 +63,7 @@ function Game() {
     ];
 
     let currentPoint = { x: startX, y: startY };
+
     let iterations = 0;
     const maxIterations = 50000;
 
@@ -66,7 +72,6 @@ function Game() {
       const newX = (currentPoint.x + activeAttractor.x) / 2;
       const newY = (currentPoint.y + activeAttractor.y) / 2;
       currentPoint = { x: newX, y: newY };
-
       drawPoint(
         context,
         currentPoint.x * canvasSize.width,
@@ -91,7 +96,7 @@ function Game() {
     if (!context) return;
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    generateChaosFractal(context, 0.5, 0.5);
+   // generateChaosFractal(context, 0.5, 0.5);
   };
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -100,6 +105,14 @@ function Game() {
 
     const context = canvas.getContext("2d");
     if (!context) return;
+
+   canvasSize.width = window.innerWidth;
+    canvasSize.height =
+      window.innerHeight > window.innerWidth
+        ? window.innerWidth
+        : window.innerHeight;
+
+
 
     const x = event.clientX - canvas.getBoundingClientRect().left;
     const y = event.clientY - canvas.getBoundingClientRect().top;
@@ -114,7 +127,7 @@ function Game() {
       onClick={handleCanvasClick}
       width={canvasSize.width}
       height={canvasSize.height}
-      style={{ flex: "1 1", width: "100%", height: "100%" }}
+      style={{ width: "100%" }}
     ></canvas>
   );
 }
