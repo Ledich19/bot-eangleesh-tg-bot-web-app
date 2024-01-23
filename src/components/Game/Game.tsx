@@ -2,53 +2,62 @@ import React, { useEffect, useState, useRef } from "react";
 
 function Game() {
   const [canvasSize, setCanvasSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: 0,
+    height: 0,
   });
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const handleResize = () => {
-      setCanvasSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-
-      // Обновление размеров канваса
       const canvas = canvasRef.current;
       if (canvas) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        const parent = canvas.parentElement;
+        if (parent) {
+          const parentRect = parent.getBoundingClientRect();
+          setCanvasSize({
+            width: parentRect.width,
+            height: parentRect.height,
+          });
+          canvas.width = parentRect.width;
+          canvas.height = parentRect.height;
+          drawCanvas();
+        }
       }
     };
 
     window.addEventListener("resize", handleResize);
+
+    handleResize();
 
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  const drawPoint = (context: CanvasRenderingContext2D, x: number, y: number) => {
+  const drawPoint = (
+    context: CanvasRenderingContext2D,
+    x: number,
+    y: number
+  ) => {
     context.beginPath();
-    context.fillStyle = "white"; // Цвет точек
-    context.fillRect(x, y, 1, 1); // Рисуем точку
+    context.fillStyle = "white";
+    context.fillRect(x, y, 1, 1);
     context.closePath();
   };
 
-  const generateChaosFractal = (context: CanvasRenderingContext2D, startX: number, startY: number) => {
-    // Задаем координаты аттракторов (вершин треугольника)
+  const generateChaosFractal = (
+    context: CanvasRenderingContext2D,
+    startX: number,
+    startY: number
+  ) => {
     const attractors = [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
       { x: 0.5, y: Math.sqrt(3) / 2 },
     ];
 
-    // Начальная точка
     let currentPoint = { x: startX, y: startY };
-
-    // Генерация точек
     let iterations = 0;
     const maxIterations = 50000;
 
@@ -58,7 +67,11 @@ function Game() {
       const newY = (currentPoint.y + activeAttractor.y) / 2;
       currentPoint = { x: newX, y: newY };
 
-      drawPoint(context, currentPoint.x * canvasSize.width, currentPoint.y * canvasSize.height);
+      drawPoint(
+        context,
+        currentPoint.x * canvasSize.width,
+        currentPoint.y * canvasSize.height
+      );
 
       iterations++;
 
@@ -68,6 +81,17 @@ function Game() {
     };
 
     drawFrame();
+  };
+
+  const drawCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    generateChaosFractal(context, 0.5, 0.5);
   };
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -85,16 +109,13 @@ function Game() {
   };
 
   return (
-    <>
-      <div>Game</div>
-      <canvas
-        ref={canvasRef}
-        onClick={handleCanvasClick}
-        width={canvasSize.width}
-        height={canvasSize.height}
-        style={{ width: "100%", height: "100%" }}
-      ></canvas>
-    </>
+    <canvas
+      ref={canvasRef}
+      onClick={handleCanvasClick}
+      width={canvasSize.width}
+      height={canvasSize.height}
+      style={{ flex: "1 1", width: "100%", height: "100%" }}
+    ></canvas>
   );
 }
 
